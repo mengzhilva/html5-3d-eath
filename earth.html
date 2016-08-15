@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="Generator" content="EditPlus®">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <title>Document</title>
+ </head>
+        <script src="three.min.js"></script>
+        <script src="jquery.min.js"></script>
+        <script src="jquery.mousewheel.js"></script>
+        <style type="text/css">
+            div#canvas-frame{
+                  border: none;
+                  cursor: move;
+                  width: 1400px;
+                  height: 600px;
+                  background-color: #EEEEEE;
+                }
+        </style>
+ <body>
+        <!--盛放canvas的容器-->
+        <div id="canvas3d"></div>
+  <script>
+  var camera, scene, renderer;
+var geometry, material, mesh;
+
+var jd = 30;
+init(jd);
+//initLight();
+animate();
+
+function init(jd) {
+
+    //设置相机
+    camera = new THREE.PerspectiveCamera(jd, window.innerWidth / window.innerHeight, 1, 10000);//设置透视投影的相机,默认情况下相机的上方向为Y轴，右方向为X轴，沿着Z轴朝里（视野角：fov 纵横比：aspect 相机离视体积最近的距离：near 相机离视体积最远的距离：far）
+    camera.position.z = 1000;
+
+    //设置场景
+    scene = new THREE.Scene();
+
+    geometry = new THREE.BoxGeometry(200, 200, 200);//width,height,depth
+    material = new THREE.MeshBasicMaterial({
+        color: 0x00ff00,
+        wireframe: true
+    });//材质设定
+
+		var texture = THREE.ImageUtils.loadTexture("dq.jpg",null,function(t)
+        {
+        });
+
+    	texture.repeat.set( 1, 1 );
+        var material = new THREE.MeshBasicMaterial( {map:texture}  );
+       // mesh = new THREE.Mesh( geometry,material );
+         var path = "pisa/";
+         var format = '.jpg';
+         var urls = [
+                path + 'a' + format, path + 'a' + format,
+               	path + 'b' + format, path + 'b' + format,
+               	path + 'a' + format, path + 'a' + format
+         ];
+         var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+       //  alert(textureCube)
+          //material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
+          var geometry = new THREE.SphereGeometry( 100, 16, 16 );
+         mesh = new THREE.Mesh( geometry,material );
+         
+         
+         
+    //设置物体
+    //mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+	var color = new THREE.Color();
+	color.setHex( 0xffffff );//设置背景色
+
+
+    renderer = new THREE.WebGLRenderer({antialias:false});//生成渲染器对象（属性：抗锯齿效果为设置有效）
+    renderer.setSize(window.innerWidth, window.innerHeight);//指定渲染器的高宽（和画布框大小一致）
+	//renderer.setClearColor('0x00ff00');
+	renderer.setClearColor( color.getHex() );//设置背景色
+    document.body.appendChild(renderer.domElement);
+
+
+}
+
+//执行
+function animate() {
+    requestAnimationFrame(animate);
+    //mesh.rotation.x += 0.05;//x旋转的速度
+    mesh.rotation.y += 0.005;//y旋转的速度
+    renderer.render(scene, camera);
+}
+var isdown = 0;
+$('body').mousedown(function(e){
+	isdown = 1;
+});
+$('body').mouseup(function(e){
+	isdown = 0;
+});
+$('body').mousemove(function(e){
+	//alert('a')
+	
+
+	if(isdown == 1){
+		mesh.rotation.y = 200 + e.pageX/100
+		mesh.rotation.x = 200 + e.pageY/100
+	    renderer.render(scene, camera);
+	    //alert(e.pageX + ", " + e.pageY);
+	}
+});
+$(document).ready(function() {
+    var count = 0;
+
+    $("body").mousewheel(function(event, delta, deltaX, deltaY) {
+        var tempStep = 50;    // evey step for scroll down or up
+
+        if (delta == 1) {  //up
+            count+=2;
+        }else if (delta == -1) { //down
+            count-=2;
+        }
+        $(this).attr("height", count);
+        camera.setLens((40+count))//放大缩小
+        event.preventDefault();
+        //count = 0;
+    });
+});
+
+//划线
+ var light;
+            function initLight() {
+                light = new THREE.DirectionalLight(0xFF0000, 1.0, 0);
+                light.position.set(100, 100, 200);
+                scene.add(light);
+            }
+  </script>
+ </body>
+</html>
